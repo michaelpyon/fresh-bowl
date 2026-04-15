@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fresh Bowl — Pet Bowl Cleaning Reminders</title>
+    <meta name="description" content="SMS reminders to clean your pet's bowls. Set a cadence, get a text, reply DONE. Streak tracking included." />
+    <meta property="og:title" content="Fresh Bowl" />
+    <meta property="og:description" content="SMS reminders to clean your pet's bowls. Set a cadence, get a text, reply DONE." />
+    <meta property="og:image" content="https://fresh-bowl.vercel.app/og.png" />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐾</text></svg>" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #fafaf8;
+        --card: #ffffff;
+        --card-alt: #f3f4f6;
+        --ink: #143437;
+        --muted: #5f6b6c;
+        --line: #d7dfdf;
+        --teal: #0d9488;
+        --teal-deep: #0f766e;
+        --success: #17795c;
+        --danger: #b45309;
+        --shadow: 0 24px 60px rgba(13, 148, 136, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Inter", sans-serif;
+      }
+
+      main {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        padding: 28px 18px 36px;
+      }
+
+      .shell {
+        width: min(100%, 880px);
+        display: grid;
+        gap: 18px;
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 32px;
+        box-shadow: var(--shadow);
+        padding: 28px;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      .paw {
+        width: 52px;
+        height: 52px;
+        border-radius: 18px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(13, 148, 136, 0.12);
+        color: var(--teal);
+      }
+
+      h1,
+      h2,
+      h3 {
+        margin: 0;
+        text-wrap: balance;
+      }
+
+      p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.6;
+        text-wrap: pretty;
+      }
+
+      .stack {
+        display: grid;
+        gap: 18px;
+      }
+
+      .header {
+        display: grid;
+        gap: 14px;
+      }
+
+      .headline {
+        font-size: clamp(2rem, 5vw, 3.15rem);
+        line-height: 0.95;
+      }
+
+      .field {
+        display: grid;
+        gap: 8px;
+      }
+
+      .field label,
+      .legend {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--ink);
+      }
+
+      .input,
+      .select,
+      .code-input {
+        width: 100%;
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--ink);
+        border-radius: 20px;
+        padding: 15px 16px;
+        font: inherit;
+        outline: none;
+      }
+
+      .input:focus,
+      .select:focus,
+      .code-input:focus {
+        border-color: rgba(13, 148, 136, 0.6);
+      }
+
+      .pill-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .pill {
+        border: 1px solid var(--line);
+        background: var(--card-alt);
+        color: var(--ink);
+        border-radius: 999px;
+        padding: 12px 16px;
+        min-height: 44px;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .pill.active {
+        background: var(--teal);
+        color: #fff;
+        border-color: var(--teal);
+      }
+
+      .selected-bowls {
+        display: grid;
+        gap: 12px;
+      }
+
+      .bowl-card {
+        border: 1px solid var(--line);
+        background: var(--card-alt);
+        border-radius: 24px;
+        padding: 16px;
+        display: grid;
+        gap: 12px;
+      }
+
+      .bowl-card-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .tiny {
+        font-size: 0.88rem;
+      }
+
+      .phone-wrap {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 10px;
+      }
+
+      .prefix {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 20px;
+        border: 1px solid var(--line);
+        background: var(--card-alt);
+        padding: 0 14px;
+        font-weight: 700;
+      }
+
+      .button {
+        border: none;
+        border-radius: 22px;
+        padding: 15px 18px;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .button-primary {
+        background: var(--teal);
+        color: #fff;
+      }
+
+      .button-secondary {
+        background: rgba(13, 148, 136, 0.12);
+        color: var(--teal-deep);
+      }
+
+      .full {
+        width: 100%;
+      }
+
+      .note {
+        font-size: 0.95rem;
+      }
+
+      .message {
+        border-radius: 20px;
+        padding: 14px 16px;
+        font-size: 0.95rem;
+      }
+
+      .message.info {
+        background: rgba(13, 148, 136, 0.1);
+        color: var(--teal-deep);
+      }
+
+      .message.error {
+        background: rgba(180, 83, 9, 0.1);
+        color: var(--danger);
+      }
+
+      .verify-box,
+      .confirmed-box {
+        border-radius: 26px;
+        border: 1px solid var(--line);
+        background: var(--card-alt);
+        padding: 18px;
+        display: grid;
+        gap: 14px;
+      }
+
+      .checkmark {
+        width: 56px;
+        height: 56px;
+        border-radius: 20px;
+        background: rgba(23, 121, 92, 0.12);
+        color: var(--success);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        font-weight: 800;
+      }
+
+      .dashboard-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .streak-badge {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        background: rgba(13, 148, 136, 0.12);
+        color: var(--teal-deep);
+        padding: 10px 14px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .bowl-list {
+        display: grid;
+        gap: 14px;
+      }
+
+      .bowl-row {
+        border: 1px solid var(--line);
+        background: var(--card-alt);
+        border-radius: 28px;
+        padding: 18px;
+        display: grid;
+        gap: 14px;
+      }
+
+      .bowl-row-top {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .bowl-id {
+        width: 52px;
+        height: 52px;
+        border-radius: 18px;
+        background: rgba(13, 148, 136, 0.12);
+        color: var(--teal-deep);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+      }
+
+      .bowl-meta {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .metric {
+        border-radius: 20px;
+        background: #fff;
+        padding: 14px;
+        border: 1px solid rgba(215, 223, 223, 0.92);
+      }
+
+      .metric span {
+        display: block;
+      }
+
+      .metric .label {
+        color: var(--muted);
+        font-size: 0.82rem;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+
+      .metric .value {
+        color: var(--ink);
+        font-weight: 700;
+      }
+
+      .dots {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 999px;
+        background: #d5dcdd;
+      }
+
+      .dot.filled {
+        background: var(--teal);
+      }
+
+      .link-button {
+        background: none;
+        border: none;
+        color: var(--teal-deep);
+        font: inherit;
+        font-weight: 700;
+        padding: 12px 0;
+        min-height: 44px;
+        cursor: pointer;
+      }
+
+      dialog {
+        width: min(100%, 620px);
+        border: none;
+        padding: 0;
+        border-radius: 30px;
+        background: transparent;
+      }
+
+      dialog::backdrop {
+        background: rgba(20, 52, 55, 0.28);
+      }
+
+      .dialog-card {
+        background: #fff;
+        border-radius: 30px;
+        border: 1px solid var(--line);
+        padding: 22px;
+        box-shadow: var(--shadow);
+        display: grid;
+        gap: 18px;
+      }
+
+      .dialog-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 160px;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .dialog-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+
+      @media (max-width: 720px) {
+        .card {
+          padding: 22px;
+          border-radius: 28px;
+        }
+
+        .dashboard-head,
+        .bowl-row-top {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .bowl-meta,
+        .dialog-row {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="shell">
+        <section id="setupState" class="card stack">
+          <div class="header">
+            <div class="paw" aria-hidden="true">
+              <svg viewBox="0 0 64 64" width="28" height="28" fill="currentColor">
+                <circle cx="18" cy="18" r="8"></circle>
+                <circle cx="46" cy="18" r="8"></circle>
+                <circle cx="14" cy="38" r="7"></circle>
+                <circle cx="50" cy="38" r="7"></circle>
+                <path d="M32 30c-8 0-15 6.4-15 13.3C17 49 22 54 28.3 54c2.7 0 4.8-1.2 7.7-1.2s5 1.2 7.7 1.2C50 54 55 49 55 43.3 55 36.4 48 30 40 30c-3.2 0-5.5 1.3-8 1.3S35.2 30 32 30z"></path>
+              </svg>
+            </div>
+            <div class="stack" style="gap: 8px;">
+              <h1 class="headline">Keep it fresh for your pet.</h1>
+              <p>
+                Set one cleanup cadence for the bowls you actually use. We text you when it is
+                time. Reply DONE when done. That is it.
+              </p>
+            </div>
+          </div>
+
+          <form id="setupForm" class="stack" novalidate>
+            <div class="field">
+              <label for="petName">Pet's name</label>
+              <input id="petName" name="petName" class="input" placeholder="Mochi" maxlength="40" />
+            </div>
+
+            <fieldset class="field" style="border: 0; padding: 0; margin: 0;">
+              <legend class="legend">Pet type</legend>
+              <div id="petTypeButtons" class="pill-row"></div>
+            </fieldset>
+
+            <fieldset class="field" style="border: 0; padding: 0; margin: 0;">
+              <legend class="legend">Bowl types</legend>
+              <div id="bowlTypeButtons" class="pill-row"></div>
+            </fieldset>
+
+            <div id="selectedBowls" class="selected-bowls"></div>
+
+            <div class="field">
+              <label for="phoneInput">Phone number</label>
+              <div class="phone-wrap">
+                <div class="prefix">US +1</div>
+                <input
+                  id="phoneInput"
+                  name="phone"
+                  class="input"
+                  type="tel"
+                  inputmode="tel"
+                  placeholder="(212) 555-0100"
+                />
+              </div>
+            </div>
+
+            <input id="timezoneInput" type="hidden" />
+
+            <div id="setupMessage" class="hidden message"></div>
+
+            <button id="setupButton" class="button button-primary full" type="submit">
+              Start reminders
+            </button>
+          </form>
+
+          <p class="note">We'll text you when it's time. Reply DONE when done. That's it.</p>
+
+          <div id="verifyBox" class="verify-box hidden">
+            <div class="stack" style="gap: 6px;">
+              <h2>Check your phone</h2>
+              <p>We sent a 6-digit code to confirm your number before reminders start.</p>
+            </div>
+            <div class="field">
+              <label for="verifyCode">Verification code</label>
+              <input
+                id="verifyCode"
+                class="code-input"
+                inputmode="numeric"
+                maxlength="6"
+                placeholder="123456"
+              />
+            </div>
+            <div id="verifyMessage" class="hidden message"></div>
+            <button id="verifyButton" class="button button-secondary full" type="button">
+              Verify phone
+            </button>
+          </div>
+        </section>
+
+        <section id="confirmedState" class="card hidden">
+          <div class="confirmed-box">
+            <div class="checkmark" aria-hidden="true">✓</div>
+            <div class="stack" style="gap: 8px;">
+              <h2 id="confirmedTitle">You're set!</h2>
+              <p id="confirmedBody"></p>
+              <p id="confirmedCadence"></p>
+            </div>
+            <button id="viewScheduleButton" class="link-button" type="button">
+              View your schedule
+            </button>
+          </div>
+        </section>
+
+        <section id="dashboardState" class="card hidden stack">
+          <div class="dashboard-head">
+            <div class="stack" style="gap: 8px;">
+              <h2 id="dashboardTitle">Fresh Bowl</h2>
+              <p id="dashboardSubtitle"></p>
+            </div>
+            <div id="streakBadge" class="streak-badge">0 days clean</div>
+          </div>
+
+          <div id="dashboardMessage" class="hidden message"></div>
+
+          <div id="bowlList" class="bowl-list"></div>
+
+          <button id="editScheduleButton" class="link-button" type="button">
+            Edit schedule
+          </button>
+        </section>
+      </div>
+    </main>
+
+    <dialog id="cadenceDialog">
+      <form method="dialog" class="dialog-card">
+        <div class="stack" style="gap: 8px;">
+          <h3>Edit schedule</h3>
+          <p>Adjust how often each bowl should trigger a reminder.</p>
+        </div>
+
+        <div id="cadenceFields" class="stack" style="gap: 12px;"></div>
+        <div id="cadenceMessage" class="hidden message"></div>
+
+        <div class="dialog-actions">
+          <button id="closeDialogButton" class="button button-secondary" value="cancel">
+            Close
+          </button>
+          <button id="saveCadenceButton" class="button button-primary" type="button">
+            Save changes
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <script>
+      const bowlMeta = {
+        water: { label: "Water Bowl", code: "WB" },
+        food: { label: "Food Bowl", code: "FB" },
+        fountain: { label: "Fountain", code: "FT" },
+        auto_feeder: { label: "Auto Feeder", code: "AF" },
+      };
+
+      const petTypes = [
+        { value: "dog", label: "Dog" },
+        { value: "cat", label: "Cat" },
+        { value: "other", label: "Other" },
+      ];
+
+      const bowlTypes = Object.entries(bowlMeta).map(([value, meta]) => ({
+        value,
+        label: meta.label,
+      }));
+
+      const API_BASE =
+        window.FRESH_BOWL_API_BASE ||
+        (window.location.protocol === "file:" ? "http://localhost:5002" : "");
+
+      const state = {
+        petType: "dog",
+        selectedBowls: new Set(["water"]),
+        pendingPhone: "",
+        dashboard: null,
+      };
+
+      const setupForm = document.getElementById("setupForm");
+      const setupState = document.getElementById("setupState");
+      const confirmedState = document.getElementById("confirmedState");
+      const dashboardState = document.getElementById("dashboardState");
+      const selectedBowlsEl = document.getElementById("selectedBowls");
+      const petTypeButtonsEl = document.getElementById("petTypeButtons");
+      const bowlTypeButtonsEl = document.getElementById("bowlTypeButtons");
+      const setupMessageEl = document.getElementById("setupMessage");
+      const verifyBoxEl = document.getElementById("verifyBox");
+      const verifyMessageEl = document.getElementById("verifyMessage");
+      const verifyButton = document.getElementById("verifyButton");
+      const setupButton = document.getElementById("setupButton");
+      const cadenceDialog = document.getElementById("cadenceDialog");
+      const cadenceFieldsEl = document.getElementById("cadenceFields");
+      const cadenceMessageEl = document.getElementById("cadenceMessage");
+
+      document.getElementById("timezoneInput").value =
+        Intl.DateTimeFormat().resolvedOptions().timeZone || "America/New_York";
+
+      function showMessage(element, tone, text) {
+        if (!text) {
+          element.className = "hidden message";
+          element.textContent = "";
+          return;
+        }
+        element.className = `message ${tone}`;
+        element.textContent = text;
+      }
+
+      function buildApiUrl(path) {
+        return `${API_BASE}${path}`;
+      }
+
+      async function request(path, options = {}) {
+        const response = await fetch(buildApiUrl(path), {
+          headers: {
+            "Content-Type": "application/json",
+            ...(options.headers || {}),
+          },
+          ...options,
+        });
+
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(payload.error || "Something went wrong.");
+        }
+        return payload;
+      }
+
+      function setVisibleState(view) {
+        setupState.classList.toggle("hidden", view !== "setup");
+        confirmedState.classList.toggle("hidden", view !== "confirmed");
+        dashboardState.classList.toggle("hidden", view !== "dashboard");
+      }
+
+      function normalizePhoneInput(raw) {
+        const trimmed = raw.trim();
+        if (!trimmed) {
+          return "";
+        }
+        if (trimmed.startsWith("+")) {
+          return trimmed;
+        }
+        const digits = trimmed.replace(/\D/g, "");
+        if (!digits) {
+          return trimmed;
+        }
+        if (digits.length === 10) {
+          return `+1${digits}`;
+        }
+        return `+${digits}`;
+      }
+
+      function renderPetTypeButtons() {
+        petTypeButtonsEl.innerHTML = "";
+        petTypes.forEach((item) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = `pill${state.petType === item.value ? " active" : ""}`;
+          button.textContent = item.label;
+          button.setAttribute("aria-pressed", String(state.petType === item.value));
+          button.addEventListener("click", () => {
+            state.petType = item.value;
+            renderPetTypeButtons();
+          });
+          petTypeButtonsEl.appendChild(button);
+        });
+      }
+
+      function renderBowlTypeButtons() {
+        bowlTypeButtonsEl.innerHTML = "";
+        bowlTypes.forEach((item) => {
+          const isActive = state.selectedBowls.has(item.value);
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = `pill${isActive ? " active" : ""}`;
+          button.textContent = item.label;
+          button.setAttribute("aria-pressed", String(isActive));
+          button.addEventListener("click", () => {
+            if (state.selectedBowls.has(item.value)) {
+              state.selectedBowls.delete(item.value);
+            } else {
+              state.selectedBowls.add(item.value);
+            }
+            renderBowlTypeButtons();
+            renderSelectedBowls();
+          });
+          bowlTypeButtonsEl.appendChild(button);
+        });
+      }
+
+      function renderSelectedBowls() {
+        selectedBowlsEl.innerHTML = "";
+        if (state.selectedBowls.size === 0) {
+          const empty = document.createElement("div");
+          empty.className = "message info";
+          empty.textContent = "Choose at least one bowl to track.";
+          selectedBowlsEl.appendChild(empty);
+          return;
+        }
+
+        Array.from(state.selectedBowls).forEach((bowlType) => {
+          const wrapper = document.createElement("div");
+          wrapper.className = "bowl-card";
+          wrapper.dataset.bowlType = bowlType;
+
+          const today = new Date().toISOString().slice(0, 10);
+          wrapper.innerHTML = `
+            <div class="bowl-card-head">
+              <div>
+                <strong>${bowlMeta[bowlType].label}</strong>
+                <p class="tiny">${recommendedLabelForBowl(bowlType)}</p>
+              </div>
+              <label class="tiny" style="display:flex; gap:8px; align-items:center;">
+                <input type="checkbox" data-role="unknown-toggle" />
+                <span>I don't remember</span>
+              </label>
+            </div>
+            <div class="field">
+              <label>When did you last clean it?</label>
+              <input class="input" type="date" data-role="last-cleaned" value="${today}" max="${today}" />
+            </div>
+          `;
+
+          const unknownToggle = wrapper.querySelector('[data-role="unknown-toggle"]');
+          const dateInput = wrapper.querySelector('[data-role="last-cleaned"]');
+          unknownToggle.addEventListener("change", () => {
+            dateInput.disabled = unknownToggle.checked;
+          });
+          selectedBowlsEl.appendChild(wrapper);
+        });
+      }
+
+      function recommendedLabelForBowl(bowlType) {
+        if (bowlType === "water") return "Recommended: every 1-2 days";
+        if (bowlType === "food") return "Recommended: daily";
+        if (bowlType === "fountain") return "Recommended: every 2 weeks";
+        return "Recommended: weekly";
+      }
+
+      function collectBowlPayloads() {
+        return Array.from(selectedBowlsEl.querySelectorAll(".bowl-card")).map((card) => {
+          const bowlType = card.dataset.bowlType;
+          const unknownToggle = card.querySelector('[data-role="unknown-toggle"]');
+          const dateInput = card.querySelector('[data-role="last-cleaned"]');
+          return {
+            bowl_type: bowlType,
+            unknown_last_cleaned: unknownToggle.checked,
+            last_cleaned: unknownToggle.checked ? null : dateInput.value,
+          };
+        });
+      }
+
+      function renderDots(dots) {
+        return `
+          <div class="dots">
+            ${dots
+              .map(
+                (dot) =>
+                  `<span class="dot${dot.filled ? " filled" : ""}" title="${dot.label}"></span>`,
+              )
+              .join("")}
+          </div>
+        `;
+      }
+
+      function renderDashboard(dashboard) {
+        state.dashboard = dashboard;
+        localStorage.setItem("freshBowlPhone", dashboard.phone);
+        document.getElementById("dashboardTitle").textContent = `${dashboard.pet_name}, ${dashboard.streak} days clean`;
+        document.getElementById("dashboardSubtitle").textContent =
+          dashboard.first_reminder
+            ? `Next up: ${dashboard.first_reminder.bowl_label} ${dashboard.first_reminder.next_reminder_label}.`
+            : "No active bowls are scheduled right now.";
+        document.getElementById("streakBadge").textContent = `${dashboard.streak} days clean`;
+
+        const bowlList = document.getElementById("bowlList");
+        bowlList.innerHTML = "";
+
+        dashboard.bowls.forEach((bowl) => {
+          const article = document.createElement("article");
+          article.className = "bowl-row";
+          article.innerHTML = `
+            <div class="bowl-row-top">
+              <div style="display:flex; gap:14px; align-items:center;">
+                <div class="bowl-id" aria-hidden="true">${bowlMeta[bowl.bowl_type].code}</div>
+                <div class="stack" style="gap:4px;">
+                  <strong>${bowl.bowl_label}</strong>
+                  <p class="tiny">${bowl.cadence_label}</p>
+                </div>
+              </div>
+            </div>
+            <div class="bowl-meta">
+              <div class="metric">
+                <span class="label">Last cleaned</span>
+                <span class="value">${bowl.last_cleaned_label}</span>
+              </div>
+              <div class="metric">
+                <span class="label">Next reminder</span>
+                <span class="value">${bowl.next_reminder_label}</span>
+              </div>
+              <div class="metric">
+                <span class="label">Schedule</span>
+                <span class="value">${bowl.recommended_cadence}</span>
+              </div>
+            </div>
+            ${renderDots(bowl.streak_dots)}
+          `;
+          bowlList.appendChild(article);
+        });
+
+        setVisibleState("dashboard");
+      }
+
+      function showConfirmed(payload) {
+        document.getElementById("confirmedTitle").textContent = "You're set!";
+        document.getElementById("confirmedBody").textContent =
+          payload.confirmed_message || "Fresh Bowl is live.";
+        document.getElementById("confirmedCadence").textContent = payload.first_reminder
+          ? `We'll keep you on a ${payload.first_reminder.cadence_label.toLowerCase()} schedule.`
+          : "";
+        setVisibleState("confirmed");
+      }
+
+      function populateCadenceDialog() {
+        const dashboard = state.dashboard;
+        cadenceFieldsEl.innerHTML = "";
+        if (!dashboard) {
+          return;
+        }
+
+        dashboard.bowls.forEach((bowl) => {
+          const row = document.createElement("label");
+          row.className = "dialog-row";
+
+          const options = bowl.editable_cadence_options
+            .map((days) => {
+              const label =
+                days === 1
+                  ? "Daily"
+                  : days === 7
+                    ? "Weekly"
+                    : days === 14
+                      ? "Every 2 weeks"
+                      : `Every ${days} days`;
+              return `<option value="${days}" ${days === bowl.cadence_days ? "selected" : ""}>${label}</option>`;
+            })
+            .join("");
+
+          row.innerHTML = `
+            <div class="stack" style="gap:4px;">
+              <strong>${bowl.bowl_label}</strong>
+              <p class="tiny">${bowl.last_cleaned_label} • next ${bowl.next_reminder_label}</p>
+            </div>
+            <select class="select" data-bowl-id="${bowl.id}">
+              ${options}
+            </select>
+          `;
+
+          cadenceFieldsEl.appendChild(row);
+        });
+      }
+
+      async function loadDashboard(phone) {
+        const dashboard = await request(`/api/dashboard/${encodeURIComponent(phone)}`);
+        renderDashboard(dashboard);
+      }
+
+      setupForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        showMessage(setupMessageEl, "", "");
+        showMessage(verifyMessageEl, "", "");
+
+        const petName = document.getElementById("petName").value.trim();
+        const phone = normalizePhoneInput(document.getElementById("phoneInput").value);
+        const bowls = collectBowlPayloads();
+
+        setupButton.disabled = true;
+        setupButton.textContent = "Setting up...";
+
+        try {
+          const payload = await request("/api/setup", {
+            method: "POST",
+            body: JSON.stringify({
+              pet_name: petName,
+              pet_type: state.petType,
+              phone,
+              timezone: document.getElementById("timezoneInput").value,
+              bowls,
+            }),
+          });
+
+          state.pendingPhone = payload.phone;
+          if (payload.verification_required) {
+            verifyBoxEl.classList.remove("hidden");
+            showMessage(
+              setupMessageEl,
+              "info",
+              payload.debug_verify_code
+                ? `Debug code: ${payload.debug_verify_code}. We also texted it.`
+                : "Verification code sent. Enter it below.",
+            );
+          } else if (payload.dashboard) {
+            renderDashboard(payload.dashboard);
+          }
+        } catch (error) {
+          showMessage(setupMessageEl, "error", error.message);
+        } finally {
+          setupButton.disabled = false;
+          setupButton.textContent = "Start reminders";
+        }
+      });
+
+      verifyButton.addEventListener("click", async () => {
+        verifyButton.disabled = true;
+        verifyButton.textContent = "Verifying...";
+        showMessage(verifyMessageEl, "", "");
+
+        try {
+          const payload = await request("/api/verify", {
+            method: "POST",
+            body: JSON.stringify({
+              phone: state.pendingPhone,
+              code: document.getElementById("verifyCode").value.trim(),
+            }),
+          });
+          showConfirmed(payload);
+          state.dashboard = payload.dashboard;
+        } catch (error) {
+          showMessage(verifyMessageEl, "error", error.message);
+        } finally {
+          verifyButton.disabled = false;
+          verifyButton.textContent = "Verify phone";
+        }
+      });
+
+      document.getElementById("viewScheduleButton").addEventListener("click", () => {
+        if (state.dashboard) {
+          renderDashboard(state.dashboard);
+        }
+      });
+
+      document.getElementById("editScheduleButton").addEventListener("click", () => {
+        populateCadenceDialog();
+        showMessage(cadenceMessageEl, "", "");
+        cadenceDialog.showModal();
+      });
+
+      document.getElementById("saveCadenceButton").addEventListener("click", async () => {
+        const selects = Array.from(cadenceFieldsEl.querySelectorAll("select"));
+        showMessage(cadenceMessageEl, "", "");
+        try {
+          let latestDashboard = state.dashboard;
+          for (const select of selects) {
+            latestDashboard = await request("/api/update-cadence", {
+              method: "POST",
+              body: JSON.stringify({
+                phone: state.dashboard.phone,
+                bowl_id: Number(select.dataset.bowlId),
+                cadence_days: Number(select.value),
+              }),
+            });
+          }
+          renderDashboard(latestDashboard);
+          cadenceDialog.close();
+        } catch (error) {
+          showMessage(cadenceMessageEl, "error", error.message);
+        }
+      });
+
+      cadenceDialog.addEventListener("close", () => {
+        showMessage(cadenceMessageEl, "", "");
+      });
+
+      async function bootstrap() {
+        renderPetTypeButtons();
+        renderBowlTypeButtons();
+        renderSelectedBowls();
+
+        const savedPhone = localStorage.getItem("freshBowlPhone");
+        if (!savedPhone) {
+          setVisibleState("setup");
+          return;
+        }
+
+        try {
+          await loadDashboard(savedPhone);
+        } catch {
+          localStorage.removeItem("freshBowlPhone");
+          setVisibleState("setup");
+        }
+      }
+
+      bootstrap();
+    </script>
+  </body>
+</html>
