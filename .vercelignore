@@ -1,0 +1,11 @@
+*.py
+__pycache__/
+.pytest_cache/
+.venv/
+instance/
+tests/
+requirements.txt
+Procfile
+*.db
+.env
+.env.example
