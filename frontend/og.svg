@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0d9488"/>
+      <stop offset="100%" stop-color="#0f766e"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <g fill="#fafaf8" opacity="0.12">
+    <circle cx="180" cy="160" r="44"/>
+    <circle cx="260" cy="160" r="44"/>
+    <circle cx="160" cy="240" r="38"/>
+    <circle cx="280" cy="240" r="38"/>
+  </g>
+  <g transform="translate(96, 360)" font-family="Inter, system-ui, sans-serif" fill="#fafaf8">
+    <text font-size="40" font-weight="600" opacity="0.85">Fresh Bowl</text>
+    <text y="92" font-size="92" font-weight="800">Keep it fresh</text>
+    <text y="184" font-size="92" font-weight="800">for your pet.</text>
+  </g>
+  <g transform="translate(96, 96)" font-family="Inter, system-ui, sans-serif" fill="#fafaf8">
+    <rect width="56" height="56" rx="18" fill="#fafaf8" opacity="0.18"/>
+    <g transform="translate(14, 14)" fill="#fafaf8">
+      <circle cx="9" cy="9" r="6"/>
+      <circle cx="23" cy="9" r="6"/>
+      <circle cx="6" cy="20" r="5"/>
+      <circle cx="22" cy="20" r="5"/>
+    </g>
+  </g>
+  <g transform="translate(96, 560)" font-family="Inter, system-ui, sans-serif" fill="#fafaf8" opacity="0.85">
+    <text font-size="26" font-weight="500">SMS reminders. Reply DONE. 7-day streaks.</text>
+  </g>
+</svg>

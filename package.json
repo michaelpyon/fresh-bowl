@@ -3,6 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "mkdir -p dist && cp frontend/index.html dist/index.html"
+    "build": "mkdir -p dist && cp frontend/index.html dist/index.html && cp frontend/og.svg dist/og.svg"
   }
 }
